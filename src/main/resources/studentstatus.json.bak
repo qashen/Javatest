@@ -1,0 +1,17 @@
+{
+	"car": [
+		{
+			"color": "Black",
+			"type": "BMW"
+		},
+		{
+			"color": "White",
+			"type": "Toyota"
+		}
+	],
+	"student": {
+		"name": "Smith",
+		"rollNo": "123"
+	},
+	"enrollStatus": "Yes"
+}

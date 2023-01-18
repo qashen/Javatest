@@ -2,6 +2,8 @@ package org.example;
 
 import java.util.HashMap;
 import java.util.Map;
+
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 
 
@@ -19,14 +21,14 @@ public class Student {
     private String rollNo;
 
     public void setName(String name) {
-        name = name;
+        this.name = name;
     }
 
     public void setRollNo(String rollNo) {
-        rollNo = rollNo;
+        this.rollNo = rollNo;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
 
@@ -38,13 +40,13 @@ public class Student {
         return rollNo;
     }
 
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
 
     @JsonAnyGetter
-    public Map<String, String> getProperties(){
+    public Map<String, Object> getProperties(){
         return properties;
     }
-    public void add(String property, String value){
+    public void add(String property, Object value){
         properties.put(property, value);
     }
 }

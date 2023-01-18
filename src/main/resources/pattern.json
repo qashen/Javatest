@@ -1,0 +1,82 @@
+{
+	"pattern": [
+		{
+			"id": "pattern-773938262-167116563465",
+			"name": "JS_Promotion1_Pattern1",
+			"description": "JS_Promotion1_Pattern1",
+			"priority": 1,
+			"relationTypeAmongGroup": "OR",
+			"criteriaGroup": [
+				{
+					"id": "CG-1619882051-1671165579339",
+					"groupName": "JS_Promotion1_CriteriaGroup1",
+					"relationTypeInGroup": "AND",
+					"criteria": [
+						{
+							"id": "criteria-1277039798-1671165605",
+							"valueType": "NUMBER",
+							"criteriaValue": "1",
+							"criteriaPara": "Quantity",
+							"criteriaOperator": "EQUALS"
+						},
+						{
+							"id": "criteria-2371638544-1671165579",
+							"valueType": "STRING",
+							"criteriaValue": "India",
+							"criteriaPara": "Country",
+							"criteriaOperator": "EQUALS"
+						}
+					]
+				},
+				{
+					"id": "CG-2893150675-1673583921715",
+					"groupName": "JS_Promotion1_CriteriaGroup2",
+					"relationTypeInGroup": "AND",
+					"criteria": [
+						{
+							"id": "criteria-2790546187-1673583962",
+							"valueType": "STRING",
+							"criteriaValue": "Bangalore",
+							"criteriaPara": "City",
+							"criteriaOperator": "EQUALS"
+						},
+						{
+							"id": "criteria-4130217847-1673583921",
+							"valueType": "PRODUCT_OFFER",
+							"criteriaValue": "PSV-PSP_PO_10006",
+							"criteriaPara": "Product Offering",
+							"criteriaOperator": "EQUALS"
+						}
+					]
+				}
+			],
+			"action": [
+				{
+					"id": "action-3146164870-167116563311",
+					"actionType": [
+						"DISCOUNT"
+					],
+					"actionValue": 0.05,
+					"actionValueObj": [
+						{
+							"id": "pricealt-1145484163-1671165638",
+							"name": "pricealt-1145484163-1671165638",
+							"actionObjectType": "PRODUCT_OFFERING_PRICE",
+							"appliesTo": "ONE_TIME",
+							"_atreferredType": "ProductOfferPriceAlterationOracle"
+						}
+					],
+					"eligibility": [
+						{
+							"id": "PL_1002",
+							"name": "Fiber Modems",
+							"actionObjectType": "PRODUCTLINE",
+							"_atreferredType": "ProductLineOracle",
+							"_attype": "ActionObjectRefOracle"
+						}
+					]
+				}
+			]
+		}
+	]
+}

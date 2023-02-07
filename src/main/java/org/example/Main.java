@@ -1,12 +1,12 @@
 package org.example;
 
-import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import siebel.integration.IO;
-import siebel.integration.SiebelMessage;
 
+import java.io.IOException;
 import java.io.InputStream;
-
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 public class Main {
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper();
@@ -22,7 +22,48 @@ public class Main {
             System.out.println(SR.getMake());
             System.out.println(SR.getDatePurchased().toString());
             System.out.println(SR.getPricePurchased().toString());
+
+            String myInput = "Country EQUALS India";
+            System.out.println("My Input is : " + myInput);
+            //String myOutputWithRegEX = Pattern.compile("EQUALS").matcher(myInput).replaceAll("=");
+            //System.out.println("My Output is : " + myOutputWithRegEX);
+
+
+            HashMap<String, String> operator = new HashMap<>();
+
+            operator.put (Operator.EQUALS.toString(), Operator.EQUALS.getMathsymbol());
+
+            // Iterating the map
+            for (Map.Entry m : operator.entrySet()) {
+                myInput = Pattern.compile (m.getKey().toString()).matcher(myInput).replaceAll(m.getValue().toString());
+            }
+            System.out.println("My Output is : " + myInput);
+
+            Operator.stream()
+                    .filter(d -> d.getMathsymbol().contains("<"))
+                    .forEach(System.out::println);
+            //Operator.stream()
+             //       .forEach(System.out::println);
+            //String equals = "EQUALS";
+            //List<Operator> operators = new ArrayList<>();
+            //for (Operator day : operators) {
+            //    System.out.println(day);
+            //}
+
+            //System.out.println (Operator.EQUALS.toString() + " " + Operator.EQUALS.getMathsymbol());
+
+            /*
+            				"id": "criteria-1277039798-1671165605",
+							"valueType": "NUMBER",
+							"criteriaValue": "1",
+							"criteriaPara": "Quantity",
+							"criteriaOperator": "EQUALS"
+
+							convert to input.criteriaPara criteriaOperator valueType criteriaValue
+             */
 /*
+
+
             LineItemIC lineItem = new LineItemIC();
             ClassLoader classLoader = lineItem.getClass().getClassLoader();
             InputStream is = classLoader.getResourceAsStream("lineitemic.json");

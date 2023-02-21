@@ -1,12 +1,20 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mvel2.MVEL;
+import org.mvel2.integration.VariableResolverFactory;
+import org.mvel2.integration.impl.MapVariableResolverFactory;
+import java.io.Serializable;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.regex.Matcher;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.sql.Timestamp;
+
+import static org.junit.Assert.assertEquals;
 public class Main {
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper();
@@ -20,7 +28,9 @@ public class Main {
 
             System.out.println(SR.getColor());
             System.out.println(SR.getMake());
-            System.out.println(SR.getDatePurchased().toString());
+            if (SR.getMapJsonPropertyField().get("Date Purchased") != null) {
+                System.out.println(SR.getDatePurchased().toString());
+            }
             System.out.println(SR.getPricePurchased().toString());
 
             String myInput = "Country EQUALS India";
@@ -42,6 +52,10 @@ public class Main {
             Operator.stream()
                     .filter(d -> d.getMathsymbol().contains("<"))
                     .forEach(System.out::println);
+
+            testFunctionReuse();
+            testCompileExpression();
+            testCompileExpression1();
             //Operator.stream()
              //       .forEach(System.out::println);
             //String equals = "EQUALS";
@@ -103,4 +117,85 @@ public class Main {
 
     //DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
     //mapper.setDateFormat(df);
+
+    public static void testFunctionReuse() {
+        VariableResolverFactory functionFactory = new MapVariableResolverFactory();
+        MVEL.eval("def Map1() { \"input.monthlySalary >= 50000.0\"; }; def Map2() { \"input.creditScore >= 500\" }; def group() { \" && \" };", functionFactory);
+        VariableResolverFactory myVarFactory = new MapVariableResolverFactory();
+        myVarFactory.setNextFactory(functionFactory);
+        Serializable s = MVEL.compileExpression("Map1() + group() + Map2();");
+        System.out.println ("Actual value: " + MVEL.executeExpression(s, myVarFactory).toString());
+        //assertEquals("foobar", MVEL.executeExpression(s, myVarFactory));
+    }
+
+    public static void testCompileExpression() {
+        Map imports = new HashMap();
+        imports.put("CustomizeClassName", java.util.HashMap.class); // import a class
+        imports.put("CustomizeMethodName", MVEL.getStaticMethod(System.class, "currentTimeMillis", new Class[0])); // import a static method
+
+        // Compile the expression
+        Serializable compiled = MVEL.compileExpression("map = new CustomizeClassName(); map.put('time', CustomizeMethodName()); map.time", imports);
+
+        // Execute with a blank Map to allow vars to be declared.
+        Long val = (Long) MVEL.executeExpression(compiled, new HashMap());
+        Timestamp ts = new Timestamp (val);
+        System.out.println ("Current time is: " + ts.toString());
+        assert val > 0;
+    }
+
+    public static void testCompileExpression1() {
+
+        // Compile the expression
+        Serializable compiled = MVEL.compileExpression("x * 10");
+
+        // Create a Map to hold the variables.
+        Map vars = new HashMap();
+
+        // Create a factory to envelop the variable map
+        VariableResolverFactory factory = new MapVariableResolverFactory(vars);
+
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            // Update the 'x' variable.
+            vars.put("x", i);
+
+            // Execute the expression against the compiled payload and factory, and add the result to the total variable.
+            total += (Integer) MVEL.executeExpression(compiled, factory);
+        }
+
+        // Total should be 49500
+        assert total == 49500;
+        System.out.println ("Current value is: " + total);
+    }
+
+    public static void testCompileExpression2() {
+
+        // Compile the expression
+        String multiply = "*";
+        VariableResolverFactory functionFactory = new MapVariableResolverFactory();
+        MVEL.eval("def DISCOUNT() { \"1 - \"; }; def LeftQuote() { \"(\" }; def RightQuote() { \"(\" }; def group() { \" && \" };", functionFactory);
+
+        Serializable compiled = MVEL.compileExpression("x * 10");
+
+        // Create a Map to hold the variables.
+        Map vars = new HashMap();
+
+        // Create a factory to envelop the variable map
+        VariableResolverFactory factory = new MapVariableResolverFactory(vars);
+
+        int total = 0;
+        for (int i = 0; i < 100; i++) {
+            // Update the 'x' variable.
+            vars.put("x", i);
+
+            // Execute the expression against the compiled payload and factory, and add the result to the total variable.
+            total += (Integer) MVEL.executeExpression(compiled, factory);
+        }
+
+        // Total should be 49500
+        assert total == 49500;
+        System.out.println ("Current value is: " + total);
+    }
 }
+
+

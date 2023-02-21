@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 public enum Operator {
 
-    EQUALS("="),
+    EQUALS("=="),
     GREATEREQUAL(">="),
     GREATERTHAN(">"),
     NOTEQUAL("<>"),

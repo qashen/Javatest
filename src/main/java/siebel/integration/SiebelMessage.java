@@ -1,22 +1,17 @@
 package siebel.integration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import siebel.integration.IO;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SiebelMessage {
-
     private IO io;
-
-    public SiebelMessage() {
-    }
-
-    public SiebelMessage(IO io) {
-        this.io = io;
-    }
-
-    public IO getIo() {
-        return io;
-    }
     @JsonProperty("SiebelMessage")
     public void setIo(IO io) {
         this.io = io;

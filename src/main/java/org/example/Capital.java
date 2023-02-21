@@ -1,13 +1,26 @@
 package org.example;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+@Data
+@Builder
+@AllArgsConstructor
 public class Capital {
     private String Color;
     private String Make;
+
+    public Capital() {
+        mapJsonPropertyField = new HashMap<>();
+    }
 
     @JsonFormat
             (shape = JsonFormat.Shape.STRING, pattern = "MM/dd/yyyy hh:mm:ss")
@@ -15,48 +28,38 @@ public class Capital {
 
     private Number pricePurchased;
 
-    public Capital() {
+    private HashMap<String, String> mapJsonPropertyField;
+
+    @JsonAnyGetter
+    public HashMap<String, String> getMapJsonPropertyField() {
+        return mapJsonPropertyField;
     }
 
-    public Capital(String color, String make, Date datePurchased, Number pricePurchased) {
-        Color = color;
-        Make = make;
-        this.datePurchased = datePurchased;
-        this.pricePurchased = pricePurchased;
+    public void setMapJsonPropertyField(HashMap<String, String> mapJsonPropertyField) {
+        this.mapJsonPropertyField = mapJsonPropertyField;
     }
 
-    public String getColor() {
-        return Color;
-    }
     @JsonProperty("Color")
     public void setColor(String Color) {
         this.Color = Color;
-    }
-
-    public String getMake() {
-        return Make;
+        this.mapJsonPropertyField.put("Color", "Color");
     }
 
     @JsonProperty("Make")
     public void setMake(String make) {
-        Make = make;
-    }
-
-    public Date getDatePurchased() {
-        return datePurchased;
+        this.Make = make;
+        this.mapJsonPropertyField.put("Make", "Make");
     }
 
     @JsonProperty("Date Purchased")
     public void setDatePurchased(Date datePurchased) {
         this.datePurchased = datePurchased;
-    }
-
-    public Number getPricePurchased() {
-        return pricePurchased;
+        this.mapJsonPropertyField.put("Date Purchased", "datePurchased");
     }
 
     @JsonProperty("Price Purchased")
     public void setPricePurchased(Number pricePurchased) {
         this.pricePurchased = pricePurchased;
+        this.mapJsonPropertyField.put("Price Purchased", "pricePurchased");
     }
 }

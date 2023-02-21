@@ -28,11 +28,17 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
      * @param expression
      * @param inputData
      */
-    public boolean parseCondition(String expression, INPUT_DATA inputData) {
-        String resolvedDslExpression = dslParser.resolveDomainSpecificKeywords(expression);
+    public boolean parseCondition(String expression, INPUT_DATA inputData, boolean bSkipDSLHandling) {
+        //String resolvedDslExpression;
+        if (!bSkipDSLHandling) {
+            expression = dslParser.resolveDomainSpecificKeywords(expression);
+        }
+        //else {
+        //    resolvedDslExpression = expression;
+        //}
         Map<String, Object> input = new HashMap<>();
         input.put(INPUT_KEYWORD, inputData);
-        boolean match = mvelParser.parseMvelExpression(resolvedDslExpression, input);
+        boolean match = mvelParser.parseMvelExpression(expression, input);
         return match;
     }
 
@@ -47,12 +53,14 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
      * @param outputResult
      * @return
      */
-    public OUTPUT_RESULT parseAction(String expression, INPUT_DATA inputData, OUTPUT_RESULT outputResult) {
-        String resolvedDslExpression = dslParser.resolveDomainSpecificKeywords(expression);
+    public OUTPUT_RESULT parseAction(String expression, INPUT_DATA inputData, OUTPUT_RESULT outputResult, boolean bSkipDSLHandling) {
+        if (!bSkipDSLHandling){
+            expression = dslParser.resolveDomainSpecificKeywords(expression);
+        }
         Map<String, Object> input = new HashMap<>();
         input.put(INPUT_KEYWORD, inputData);
         input.put(OUTPUT_KEYWORD, outputResult);
-        mvelParser.parseMvelExpression(resolvedDslExpression, input);
+        mvelParser.parseMvelExpression(expression, input);
         return outputResult;
     }
 

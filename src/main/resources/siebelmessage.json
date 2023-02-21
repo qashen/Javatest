@@ -1,36 +1,44 @@
 {
-    "SiebelMessage": {
-        "IntObjectName": "SWIISSPriceListItemIO",
-        "ListOfSWIISSPriceListItemIO": {
-            "Price List Item - Import": [
-                {
-                    "Dynamic Matrix Id": "",
-                    "Product Id": "88-1W3BZP",
-                    "Price List Id": "88-1X7ZRS",
-                    "Description": "",
-                    "Pricing Method": "List Price",
-                    "Start Date": "02/15/2022 06:00:00",
-                    "Volume Discount": "",
-                    "Original List Price": 300,
-                    "External Integration Id": "POP_10115",
-                    "Id": "dummyId"
-                },
-                {
-                    "Dynamic Matrix Id": "",
-                    "Product Id": "88-1W3BZP",
-                    "Price List Id": "88-1X7ZRS",
-                    "Description": "name",
-                    "Pricing Method": "List Price",
-                    "Start Date": "02/15/2022 05:25:21",
-                    "Volume Discount": "",
-                    "Original List Price": 60,
-                    "External Integration Id": "ID-209618471-1645634931861",
-                    "Id": "dummyId"
-                }
-            ]
-        },
-        "IntObjectFormat": "Siebel Hierarchical",
-        "MessageId": "",
-        "MessageType": "Integration Object"
-    }
+	"SiebelMessage": {
+		"IntObjectName": "SWIISSPriceListItemIO",
+		"ListOfSWIISSPriceListItemIO": {
+			"Price List Item - Import": [
+				{
+					"Dynamic Matrix Id": "",
+					"Product Id": "88-1W3BZP",
+					"Price List Id": "88-1X7ZRS",
+					"Description": "",
+					"Pricing Method": "List Price",
+					"Start Date": "02/15/2022 06:00:00",
+					"Volume Discount": "",
+					"Original List Price": 300,
+					"External Integration Id": "POP_10115",
+					"Id": "dummyId",
+					"Quantity": 1,
+					"Country": "India",
+					"Product Offering": "PSV-PSP_POP_10115",
+					"City": "Bangalore"
+				},
+				{
+					"Dynamic Matrix Id": "",
+					"Product Id": "88-1W3BZP",
+					"Price List Id": "88-1X7ZRS",
+					"Description": "name",
+					"Pricing Method": "List Price",
+					"Start Date": "02/15/2022 05:25:21",
+					"Volume Discount": "",
+					"Original List Price": 60,
+					"External Integration Id": "ID-209618471-1645634931861",
+					"Id": "dummyId",
+					"Quantity": 2,
+					"Country": "India",
+					"Product Offering": "PSV-PSP_PO_10006",
+					"City": "Bangalore"
+				}
+			]
+		},
+		"IntObjectFormat": "Siebel Hierarchical",
+		"MessageId": "",
+		"MessageType": "Integration Object"
+	}
 }

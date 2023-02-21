@@ -1,21 +1,25 @@
 package siebel.integration.rule;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ActionType {
-    private String[] actionType;
-
-    public ActionType() {
-    }
-
-    public ActionType(String[] actionType) {
-        this.actionType = actionType;
-    }
-
-    public String[] getActionType() {
-        return actionType;
-    }
-    @JsonProperty("actionType")
-    public void setActionType(String[] actionType) {
-        this.actionType = actionType;
-    }
+    /*
+    ALLOWANCE,
+    AWARD,
+    DISCOUNT,
+    FIXED_DISCOUNT,
+    FIXED_MARKUP,
+    GIFT_ALLOWANCE,
+    REDUCTION,
+    PERCENTAGE_DISCOUNT,
+    PERCENTAGE_MARKUP,
+    PRICE_OVERRIDE*/
+    String actionTpe;
 }

@@ -1,8 +1,5 @@
 package siebel.integration.util;
 
-/**
- * Types of different DX4C Users
- */
 public enum RuleType {
 
     //ROOT, CRITERIA, AND, OR, GROUP_AND, GROUP_OR

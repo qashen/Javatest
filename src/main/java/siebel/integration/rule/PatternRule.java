@@ -1,19 +1,17 @@
 package siebel.integration.rule;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class PatternRule {
     private Pattern[] patterns;
-
-    public PatternRule() {
-    }
-
-    public PatternRule(Pattern[] patterns) {
-        this.patterns = patterns;
-    }
-
-    public Pattern[] getPatterns() {
-        return patterns;
-    }
     @JsonProperty("pattern")
     public void setPatterns(Pattern[] patterns) {
         this.patterns = patterns;

@@ -52,26 +52,141 @@
 			],
 			"action": [
 				{
-					"id": "action-3146164870-167116563311",
+					"id": "action-2536090876-167670791997",
 					"actionType": [
-						"DISCOUNT"
+						"FIXED_MARKUP"
 					],
-					"actionValue": 0.05,
+					"actionValue": 100,
 					"actionValueObj": [
 						{
-							"id": "pricealt-1145484163-1671165638",
-							"name": "pricealt-1145484163-1671165638",
+							"versionState": 0,
+							"id": "pricealt-1916983665-1676707929",
+							"name": "pricealt-1916983665-1676707929",
 							"actionObjectType": "PRODUCT_OFFERING_PRICE",
 							"appliesTo": "ONE_TIME",
+							"maxQuantity": 10,
 							"_atreferredType": "ProductOfferPriceAlterationOracle"
 						}
 					],
 					"eligibility": [
 						{
-							"id": "PL_1002",
-							"name": "Fiber Modems",
+							"versionState": 2,
+							"id": "SS_SO2",
+							"name": "SS_SO2",
+							"actionObjectType": "PRODUCT_OFFERING",
+							"_atreferredType": "ProductOfferingOracle",
+							"_attype": "ActionObjectRefOracle"
+						}
+					]
+				},
+				{
+					"id": "action-3495334232-167389746196",
+					"actionType": [
+						"REDUCTION"
+					],
+					"actionValue": 90,
+					"actionValueObj": [
+						{
+							"versionState": 0,
+							"id": "pricealt-2086943909-1673897508",
+							"name": "pricealt-2086943909-1673897508",
+							"actionObjectType": "PRODUCT_OFFERING_PRICE",
+							"appliesTo": "USAGE",
+							"maxQuantity": 9,
+							"_atreferredType": "ProductOfferPriceAlterationOracle"
+						}
+					],
+					"eligibility": [
+						{
+							"versionState": 2,
+							"id": "PL-1379165141-1672658341027",
+							"name": "PL0201",
 							"actionObjectType": "PRODUCTLINE",
 							"_atreferredType": "ProductLineOracle",
+							"_attype": "ActionObjectRefOracle"
+						}
+					]
+				},
+				{
+					"id": "action-3575099242-167670802359",
+					"actionType": [
+						"DISCOUNT"
+					],
+					"actionValue": 0.2,
+					"actionValueObj": [
+						{
+							"versionState": 0,
+							"id": "pricealt-2233411073-1676708099",
+							"name": "pricealt-2233411073-1676708099",
+							"actionObjectType": "PRODUCT_OFFERING_PRICE",
+							"appliesTo": "RECURRING",
+							"maxQuantity": 2,
+							"_atreferredType": "ProductOfferPriceAlterationOracle"
+						}
+					],
+					"eligibility": [
+						{
+							"versionState": 2,
+							"id": "PL-1379165141-1672658341027",
+							"name": "PL0201",
+							"actionObjectType": "PRODUCTLINE",
+							"_atreferredType": "ProductLineOracle",
+							"_attype": "ActionObjectRefOracle"
+						}
+					]
+				},
+				{
+					"id": "action-4080228679-167670805096",
+					"actionType": [
+						"PERCENT_MARKUP"
+					],
+					"actionValue": 0.25,
+					"actionValueObj": [
+						{
+							"versionState": 0,
+							"id": "pricealt-3508320711-1676708099",
+							"name": "pricealt-3508320711-1676708099",
+							"actionObjectType": "PRODUCT_OFFERING_PRICE",
+							"appliesTo": "ONE_TIME",
+							"maxQuantity": 3,
+							"_atreferredType": "ProductOfferPriceAlterationOracle"
+						}
+					],
+					"eligibility": [
+						{
+							"versionState": 2,
+							"id": "PS-18634806-1672993023580",
+							"name": "VoPS1",
+							"actionObjectType": "PRODUCT_SPECIFICATION",
+							"_atreferredType": "ProductSpecificationOracle",
+							"_attype": "ActionObjectRefOracle"
+						}
+					]
+				},
+				{
+					"id": "action-91393508-1676708079978",
+					"actionType": [
+						"OVERRIDE"
+					],
+					"actionValue": 160,
+					"actionValueObj": [
+						{
+							"versionState": 0,
+							"id": "pricealt-4035958799-1676708099",
+							"name": "pricealt-4035958799-1676708099",
+							"actionObjectType": "PRODUCT_OFFERING_PRICE",
+							"appliesTo": "ALL",
+							"maxQuantity": 3,
+							"_atreferredType": "ProductOfferPriceAlterationOracle"
+						}
+					],
+					"eligibility": [
+						{
+							"versionState": 2,
+							"id": "id-728317833-1671638486936",
+							"name": "OptionGroupBug20DecOg1",
+							"actionObjectType": "PRODUCT_OFFERING",
+							"_atreferredType": "ProductOfferingOracle",
 							"_attype": "ActionObjectRefOracle"
 						}
 					]

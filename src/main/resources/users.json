@@ -1,0 +1,34 @@
+{
+	"User": [
+		{
+			"creditScore": 900,
+			"firstName": "Mark",
+			"lastName": "K",
+			"age": "25",
+			"accountNumber": 123456789,
+			"bank": "ABC BANK",
+			"requestedLoanAmount": 350000,
+			"monthlySalary": 70000
+		},
+		{
+			"creditScore": 450,
+			"firstName": "Michael",
+			"lastName": "K",
+			"age": "25",
+			"accountNumber": 999999999,
+			"bank": "ABC BANK",
+			"requestedLoanAmount": 350000,
+			"monthlySalary": 70000
+		},
+		{
+			"creditScore": 200,
+			"firstName": "Rachel",
+			"lastName": "K",
+			"age": "25",
+			"accountNumber": 14526875545,
+			"bank": "ABC BANK",
+			"requestedLoanAmount": 150000,
+			"monthlySalary": 70000
+		}
+	]
+}

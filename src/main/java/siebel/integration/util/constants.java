@@ -20,4 +20,5 @@ public class constants {
     public static final String LESS_THAN_W = ".lt";
     public static final String AND = "AND";
     public static final String OR = "OR";
+    public static final String INPUT_ARGS = "{Input}";
 }

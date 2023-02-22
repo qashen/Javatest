@@ -1,4 +1,4 @@
-package siebel.integration.util;
+package siebel.integration.rule;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

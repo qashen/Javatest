@@ -1,4 +1,4 @@
-package siebel.integration.util;
+package siebel.integration.rule;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,4 +16,5 @@ public class RuleNode {
     private String criteriaGroupId;
     private String criteriaId;
     private String patternId;
+    private String expression;
 }

@@ -1,4 +1,4 @@
-package siebel.integration.util;
+package siebel.integration.rule;
 
 public enum RuleType {
 

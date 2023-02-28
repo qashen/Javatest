@@ -21,4 +21,11 @@ public class constants {
     public static final String AND = "AND";
     public static final String OR = "OR";
     public static final String INPUT_ARGS = "{Input}";
+    public static final String SIEBELMESSAGE = "SiebelMessage";
+    public static final String LISTOFIO = "ListOfSWIOrderIO";
+    public static final String ORDERHEADER = "SWIOrder";
+    public static final String LISTOFITEM = "ListOfSWIOrderItem";
+    public static final String LINEITEM = "SWIOrderItem";
+
+
 }

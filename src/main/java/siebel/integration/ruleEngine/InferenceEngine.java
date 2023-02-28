@@ -1,11 +1,9 @@
 package siebel.integration.ruleEngine;
 import siebel.integration.langParser.RuleParser;
-import siebel.integration.util.FieldCopyUtil;
+import siebel.integration.util.PricingUtil;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -69,8 +67,9 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
             List<OUTPUT_RESULT> outputParent = new ArrayList<>();
             for (String expression: rule.getActionSet()) {
                 OUTPUT_RESULT outputResult = initializeOutputResult();
-                FieldCopyUtil.setFields(inputData, outputResult);
-                outputResult = ruleParser.parseAction(expression, inputData, outputResult, true);
+                //PricingUtil.setFields((LinkedHashMap) inputData, (LinkedHashMap) outputResult);
+                //outputResult = ruleParser.parseAction(expression, inputData, outputResult, true);
+                outputResult = ruleParser.parseAction(expression, inputData, outputResult);
                 outputParent.add(outputResult);
             }
             return (OUTPUT_RESULT) outputParent;

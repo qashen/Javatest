@@ -14,10 +14,15 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.sql.Timestamp;
 
+//import oracle.cx.industry.buying.mappings.ProductPromotionTransformer;
+
 import static org.junit.Assert.assertEquals;
 public class Main {
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper();
+        Object siebelResponse = new Object();
+        //ProductPromotionTransformer promotionService = new ProductPromotionTransformer();
+        //promotionService.transform(siebelResponse);
 
         try {
 

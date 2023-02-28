@@ -10,7 +10,7 @@ public class LoanInferenceEngine extends InferenceEngine<UserDetails, LoanDetail
 
     @Override
     protected RuleNamespace getRuleNamespace() {
-        return RuleNamespace.LOAN;
+        return RuleNamespace.PRICING;
     }
 
     @Override

@@ -2,7 +2,9 @@ package siebel.integration.langParser;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
 
@@ -60,6 +62,23 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
         Map<String, Object> input = new HashMap<>();
         input.put(INPUT_KEYWORD, inputData);
         input.put(OUTPUT_KEYWORD, outputResult);
+        Map<String, String> maps = new HashMap<>();
+        input.put("map", maps);
+        mvelParser.parseMvelExpression(expression, input);
+        for (Map.Entry m : maps.entrySet())
+        {
+            if (((LinkedHashMap) outputResult).get (m.getKey()) != null)
+            {
+                ((LinkedHashMap) outputResult).put (m.getKey(),m.getValue());
+            }
+        }
+        return outputResult;
+    }
+
+    public OUTPUT_RESULT parseAction(String expression, INPUT_DATA inputData, OUTPUT_RESULT outputResult) {
+        Map<String, Object> input = new HashMap<>();
+        input.put(INPUT_KEYWORD, inputData);
+        input.put("map", outputResult);
         mvelParser.parseMvelExpression(expression, input);
         return outputResult;
     }

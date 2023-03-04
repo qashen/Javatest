@@ -6,9 +6,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
-    private RuleParser<INPUT_DATA, OUTPUT_RESULT> ruleParser;
+    private final RuleParser<INPUT_DATA, OUTPUT_RESULT> ruleParser;
 
     public InferenceEngine() {
         this.ruleParser = new RuleParser();
@@ -29,9 +29,8 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
         }
 
         //STEP 3 (EXECUTE) : Run the action of the selected rule on given data and return the output.
-        OUTPUT_RESULT outputResult = executeRule(resolvedRule, inputData);
 
-        return outputResult;
+        return executeRule(resolvedRule, inputData);
     }
 
     protected List<Rule> match(List<Rule> listOfRules, INPUT_DATA inputData){
@@ -49,10 +48,7 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
     protected Rule resolve(List<Rule> conflictSet){
         Optional<Rule> rule = conflictSet.stream()
                 .findFirst();
-        if (rule.isPresent()){
-            return rule.get();
-        }
-        return null;
+        return rule.orElse(null);
     }
 
 
@@ -66,8 +62,6 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
             List<OUTPUT_RESULT> outputParent = new ArrayList<>();
             for (String expression: rule.getActionSet()) {
                 OUTPUT_RESULT outputResult = initializeOutputResult();
-                //PricingUtil.setFields((LinkedHashMap) inputData, (LinkedHashMap) outputResult);
-                //outputResult = ruleParser.parseAction(expression, inputData, outputResult, true);
                 outputResult = ruleParser.parseAction(expression, inputData, outputResult);
                 outputParent.add(outputResult);
             }

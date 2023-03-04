@@ -8,14 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pricing.rule.ActionDetails;
 import pricing.ruleEngine.Rule;
-import pricing.rule.*;
 import pricing.ruleEngine.RuleNamespace;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class PricingUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(PricingUtil.class);
 
@@ -68,11 +67,7 @@ public class PricingUtil {
     }
 
     public static void setFields(LinkedHashMap from, LinkedHashMap to) {
-        from.forEach((key, value) -> {
-            {
-                to.put (key,value);
-            }
-        });
+        to.putAll(from);
     }
 
 

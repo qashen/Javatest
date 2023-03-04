@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static pricing.util.constants.*;
-
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class CBDPricingServiceImpl implements CBDPricingService {
 
     @Override
@@ -49,10 +49,7 @@ public class CBDPricingServiceImpl implements CBDPricingService {
                             mapProperties.put("Product Offering", "productOffering");
                             List<Rule> ruleList = new ArrayList<>();
                             PricingUtil.SetRule(ruleListObj, ruleList, mapProperties);
-                            if (ruleList != null)
-                            {
-                                mainObj.put (RULE, ruleList);
-                            }
+                            mainObj.put (RULE, ruleList);
                         }
 
                     }

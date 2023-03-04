@@ -17,7 +17,7 @@ public class DSLKeywordResolver {
     BankResolver bankResolver;
 
     public DSLKeywordResolver() {
-        dslKeywordResolverList = new HashMap();
+        dslKeywordResolverList = new HashMap<>();
 
     }
 

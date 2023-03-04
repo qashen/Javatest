@@ -5,7 +5,6 @@ import org.mvel2.MVEL;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.MapVariableResolverFactory;
 import java.io.Serializable;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +15,9 @@ import java.sql.Timestamp;
 
 //import oracle.cx.industry.buying.mappings.ProductPromotionTransformer;
 
-import static org.junit.Assert.assertEquals;
 public class Main {
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper();
-        Object siebelResponse = new Object();
-        //ProductPromotionTransformer promotionService = new ProductPromotionTransformer();
-        //promotionService.transform(siebelResponse);
 
         try {
 

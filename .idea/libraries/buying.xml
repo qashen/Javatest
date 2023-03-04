@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="buying">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/buying/buying.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

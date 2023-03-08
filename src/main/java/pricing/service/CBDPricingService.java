@@ -1,8 +1,6 @@
 package pricing.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.yaml.snakeyaml.error.MarkedYAMLException;
-
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -20,7 +18,7 @@ public interface CBDPricingService {
 
     Object retrieveRule (InputStream is);
 
-    List<Object> retrieveItems (LinkedHashMap<String, String> lhm, Map<String,Object> object) throws NullPointerException;
-    List<Object> retrieveItems (Map.Entry<String, String> entry, Iterator it, Map<String, Object> object) throws NullPointerException;
-    List<Object> retrieveItems (Map.Entry<String, String> entry, Iterator it, List<Object> object) throws NullPointerException;
+    List<Object> retrieveItems (LinkedHashMap<String, Object> lhm, Map<String,Object> object) throws NullPointerException;
+    List<Object> retrieveItems (Map.Entry<String, Object> entry, Iterator<Map.Entry<String, Object>> it, Map<String, Object> object) throws NullPointerException;
+    List<Object> retrieveItems (Map.Entry<String, Object> entry, Iterator<Map.Entry<String, Object>> it, List<Object> object) throws NullPointerException;
 }

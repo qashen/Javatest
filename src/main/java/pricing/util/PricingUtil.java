@@ -10,11 +10,13 @@ import pricing.rule.ActionDetails;
 import pricing.ruleEngine.Rule;
 import pricing.ruleEngine.RuleNamespace;
 
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-@SuppressWarnings({ "unchecked", "rawtypes" })
+
+import static pricing.util.constants.*;
+
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class PricingUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(PricingUtil.class);
 
@@ -22,6 +24,7 @@ public class PricingUtil {
             .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
     public static String convertObjectToJson(Object object) {
         try {
             return mapper.writeValueAsString(object);
@@ -40,7 +43,7 @@ public class PricingUtil {
         }
     }
 
-    public static <T> T convertJsonMapToObject(Map<String,Object> jsonMap, Class<T> clazz) {
+    public static <T> T convertJsonMapToObject(Map<String, Object> jsonMap, Class<T> clazz) {
         try {
             String json = convertObjectToJson(jsonMap);
             return mapper.readValue(json, clazz);
@@ -50,71 +53,109 @@ public class PricingUtil {
         }
     }
 
-    public static void setFields(Object from, Object to) {
-        Field[] fields = from.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                Field fieldFrom = from.getClass().getDeclaredField(field.getName());
-                Object value = fieldFrom.get(from);
-                to.getClass().getDeclaredField(field.getName()).set(to, value);
 
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (NoSuchFieldException e) {
-                //e.printStackTrace();
+    public static void addToRef(LinkedHashMap<String, Object> ruleIndex,
+                                Map<String, String> mapProperties,
+                                Map<String, String> mapRuleFields,
+                                Map<String, String> mapInputFields) {
+        String strTagValue = String.valueOf(ruleIndex.get (TAG_INTER_GROUP));
+        mapProperties.put(TAG_INTER_GROUP, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_GROUP_NAME));
+        mapProperties.put(TAG_GROUP_NAME, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_ID));
+        mapProperties.put(TAG_ID, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_INTRA_GROUP));
+        mapProperties.put(TAG_INTRA_GROUP, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_CRITERIA_NAME));
+        mapProperties.put(TAG_CRITERIA_NAME, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_VALUE_TYPE));
+        mapProperties.put(TAG_VALUE_TYPE, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_CRITERIA_OP));
+        mapProperties.put(TAG_CRITERIA_OP, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_CRITERIA_VAL));
+        mapProperties.put(TAG_CRITERIA_VAL, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_CRITERIA_PARA));
+        mapProperties.put(TAG_CRITERIA_PARA, strTagValue);
+        strTagValue = String.valueOf(ruleIndex.get (TAG_ACTION));
+        mapProperties.put(TAG_ACTION, strTagValue);
+        LinkedHashMap<String, Object> criteriaField = (LinkedHashMap<String, Object>)ruleIndex.get (TAG_CRITERIA_FLD);
+        for (Map.Entry field : criteriaField.entrySet()) {
+            if (!Objects.isNull (field.getKey())) {
+                mapRuleFields.put(field.getKey().toString(), field.getKey().toString().replaceAll("\\s", ""));
+                mapInputFields.put(field.getValue().toString(), field.getKey().toString().replaceAll("\\s", ""));
             }
         }
     }
 
-    public static void setFields(LinkedHashMap from, LinkedHashMap to) {
-        to.putAll(from);
+    public static void setFields(Map<String, String> from, List<Object> to) {
+        if (to.size() > 0) {
+            for (Object item : to) {
+                for (Map.Entry<String, String> m : from.entrySet()) {
+                    {
+                        if (((LinkedHashMap<?, ?>) item).get(m.getKey()) != null) {
+                            ((LinkedHashMap) item).put(m.getValue(), ((LinkedHashMap<?, ?>) item).get(m.getKey()));
+                        }
+                    }
+                }
+            }
+        }
     }
 
-
-    public static void SetRule(List<Object> pr, List<Rule> ruleList, Map<String, String> mapProperties) {
+    public static void SetRule(List<Object> pr, List<Rule> ruleList, Map<String, String> mapProperties, Map<String, String> mapFields) {
         AtomicReference<String> Input = new AtomicReference<>();
         HashMap<String, ActionDetails> actionMaps = new HashMap<>();
         HashMap<String, String> operator = new HashMap<>();
         operator.put(Operator.EQUALS.toString(), Operator.EQUALS.getMathsymbol());
         for (Object p : pr) {
-            if (!((LinkedHashMap) p).get("id").toString().isEmpty()) {
-                if (((LinkedHashMap) p).get("relationTypeAmongGroup").toString().compareToIgnoreCase(constants.OR) == 0) {
-                    List<Object> criteriaGroupList = (List<Object>) ((LinkedHashMap) p).get("criteriaGroup");
+            if (!Objects.isNull(((LinkedHashMap) p).get(mapProperties.get(TAG_ID))) &&
+                    !((LinkedHashMap) p).get(mapProperties.get(TAG_ID)).toString().isEmpty()) {
+                if (!Objects.isNull(((LinkedHashMap) p).get(mapProperties.get(TAG_INTER_GROUP))) &&
+                        ((LinkedHashMap) p).get(mapProperties.get(TAG_INTER_GROUP)).toString().compareToIgnoreCase(constants.OR) == 0) {
+                    List<Object> criteriaGroupList = (List<Object>) ((LinkedHashMap) p).get(mapProperties.get(TAG_GROUP_NAME));
                     if (criteriaGroupList != null && criteriaGroupList.size() > 0) {
                         for (Object criteriaGroup : criteriaGroupList) {
                             Rule rule = new Rule(true);
                             final StringJoiner[] stringJoiner = {new StringJoiner("")};
                             int counter = 0;
-                            List<Object> criteriaList = (List<Object>) ((LinkedHashMap)criteriaGroup).get("criteria");
-                            for (Object criteria : criteriaList) {
-                                if (counter != 0) {
-                                    if (((LinkedHashMap) criteriaGroup).get("relationTypeInGroup").toString().compareToIgnoreCase(constants.AND) == 0) {
-                                        stringJoiner[0].add(" && ");
-                                    } else if (((LinkedHashMap) criteriaGroup).get("relationTypeInGroup").toString().compareToIgnoreCase(constants.OR) == 0) {
-                                        stringJoiner[0].add("||");
+                            List<Object> criteriaList = (List<Object>) ((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_CRITERIA_NAME));
+                            if (criteriaList != null && criteriaList.size() > 0) {
+                                for (Object criteria : criteriaList) {
+                                    if (counter != 0) {
+                                        if (((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_INTRA_GROUP)).toString().compareToIgnoreCase(constants.AND) == 0) {
+                                            stringJoiner[0].add(" && ");
+                                        } else if (((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_INTRA_GROUP)).toString().compareToIgnoreCase(constants.OR) == 0) {
+                                            stringJoiner[0].add(" || ");
+                                        }
                                     }
+                                    if (((LinkedHashMap) criteria).get(mapProperties.get(TAG_VALUE_TYPE)).toString().compareToIgnoreCase("NUMBER") == 0) {
+                                        Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
+                                                ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " " +
+                                                ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString());
+                                    } else if ((((LinkedHashMap) criteria).get(mapProperties.get(TAG_VALUE_TYPE)).toString().compareToIgnoreCase("STRING") == 0) ||
+                                            (((LinkedHashMap) criteria).get(mapProperties.get(TAG_VALUE_TYPE)).toString().compareToIgnoreCase("PRODUCT_OFFER") == 0)) {
+                                        Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
+                                                ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " '" +
+                                                ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString() + "'");
+
+                                    } else
+                                        Input.set("");
+                                    operator.forEach((key, value) -> {
+                                        String convertedRule = java.util.regex.Pattern.compile(key).matcher(Input.get()).replaceAll(value);
+                                        stringJoiner[0].add(convertedRule);
+                                    });
+                                    counter++;
                                 }
-
-                                if (((LinkedHashMap)criteria).get("valueType").toString().compareToIgnoreCase("NUMBER") == 0) {
-                                    Input.set("input." + mapProperties.get(((LinkedHashMap)criteria).get("criteriaPara").toString())+ " " + ((LinkedHashMap)criteria).get("criteriaOperator").toString() + " " + ((LinkedHashMap)criteria).get("criteriaValue").toString());
-                                } else if ((((LinkedHashMap)criteria).get("valueType").toString().compareToIgnoreCase("STRING") == 0)|| (((LinkedHashMap)criteria).get("valueType").toString().compareToIgnoreCase("PRODUCT_OFFER") == 0)) {
-                                    Input.set("input." + mapProperties.get(((LinkedHashMap)criteria).get("criteriaPara").toString())+ " " + ((LinkedHashMap)criteria).get("criteriaOperator").toString() + " '" + ((LinkedHashMap)criteria).get("criteriaValue").toString() + "'");
-
-                                } else
-                                    Input.set("");
-                                operator.forEach((key, value) -> {
-                                    String convertedRule = java.util.regex.Pattern.compile(key).matcher(Input.get()).replaceAll(value);
-                                    stringJoiner[0].add(convertedRule);
-                                });
-                                counter++;
                             }
                             rule.setRuleNamespace(RuleNamespace.valueOf("PRICING"));
-                            rule.setRuleId(((LinkedHashMap)criteriaGroup).get("id").toString());
+                            if (!Objects.isNull(((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_ID)))) {
+                                rule.setRuleId(((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_ID)).toString());
+                            }
                             rule.setCondition(stringJoiner[0].toString());
                             SetActions(pr, rule, actionMaps);
                             ruleList.add(rule);
                         }
-                    } else if (((LinkedHashMap) p).get("relationTypeAmongGroup").toString().compareToIgnoreCase(constants.AND) == 0) {
+                    } else if (!Objects.isNull(((LinkedHashMap) p).get(mapProperties.get(TAG_INTER_GROUP))) &&
+                            ((LinkedHashMap) p).get(mapProperties.get(TAG_INTER_GROUP)).toString().compareToIgnoreCase(constants.AND) == 0) {
                         System.out.println("TODO");
                     }
                 }
@@ -127,9 +168,9 @@ public class PricingUtil {
         List<String> actionSet = new ArrayList<>();
         AtomicReference<String> actionInput = new AtomicReference<>();
         actionMaps.forEach((key, value) -> {
-            String actionExpression = value.getExpression().replace("{Input}", "input.currentPrice");
-            actionInput.set ("map.put(\"currentPrice\"," + actionExpression + ");");
-            actionSet.add (actionInput.toString());
+            String actionExpression = value.getExpression().replace(constants.INPUT_ARGS, "input.Price");
+            actionInput.set("map.put(\"Price\"," + actionExpression + ");map.put(\"Adjustment Type\",\"" + value.getAdjustmentType() + "\");map.put(\"Adjustment Amount\"," + value.getAdjustmentValue() + ");");
+            actionSet.add(actionInput.toString());
         });
 
         rule.setActionSet(actionSet);
@@ -169,15 +210,17 @@ public class PricingUtil {
         switch (actionDetails.getAdjustmentType()) {
             case "DISCOUNT" -> {
                 ratio = 1 - (Double) actionDetails.getAdjustmentValue();
-                Input.set(constants.INPUT_ARGS + " * " + ratio);
+                Input.set("(double)" + constants.INPUT_ARGS + " * " + ratio);
             }
-            case "FIXED_MARKUP" -> Input.set(constants.INPUT_ARGS + " + " + actionDetails.getAdjustmentValue().toString());
+            case "FIXED_MARKUP" ->
+                    Input.set("(double)" + constants.INPUT_ARGS + " + " + actionDetails.getAdjustmentValue());
             case "OVERRIDE" -> Input.set(actionDetails.getAdjustmentValue().toString());
             case "PERCENT_MARKUP" -> {
                 ratio = 1 + (Double) actionDetails.getAdjustmentValue();
-                Input.set(constants.INPUT_ARGS + " * " + ratio);
+                Input.set("(double)" + constants.INPUT_ARGS + " * " + ratio);
             }
-            case "REDUCTION" -> Input.set(constants.INPUT_ARGS + " - " + actionDetails.getAdjustmentValue());
+            case "REDUCTION" ->
+                    Input.set("(double)" + constants.INPUT_ARGS + " - " + actionDetails.getAdjustmentValue());
             default -> {
             }
         }

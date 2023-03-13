@@ -12,16 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class Rule {
-    public Rule(boolean bSkipDSLHandling) {
-        this.bSkipDSLHandling = bSkipDSLHandling;
-    }
-
     RuleNamespace ruleNamespace;
     String ruleId;
     String condition;
-    String action;
     Integer priority;
     String description;
-    boolean bSkipDSLHandling;
     List<String> actionSet;
 }

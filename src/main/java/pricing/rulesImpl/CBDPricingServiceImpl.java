@@ -3,10 +3,12 @@ package pricing.rulesImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import pricing.ruleEngine.Rule;
+import pricing.ruleEngine.Event;
+import pricing.ruleEngine.RuleEngine;
 import pricing.service.CBDPricingService;
 import pricing.util.ObjectUtils;
 import pricing.util.PricingUtil;
+import pricing.util.constants;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +21,39 @@ import java.util.stream.Collectors;
 import static pricing.util.constants.*;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class CBDPricingServiceImpl implements CBDPricingService {
+
+    @Override
+    public Object priceCBD (InputStream inputStream, InputStream ruleStream, InputStream indexYaml) {
+        List<Object> combined;
+        Map<String, Object> mainObject = (Map<String, Object>) buildRule(inputStream, ruleStream, indexYaml);
+        List<Object> lineItem = (List<Object>) mainObject.get(constants.INPUT);
+        Map<String, Object> mapRuleList = (Map<String, Object>) mainObject.get(constants.RULE);
+        Map<String, String> mapFields = (Map<String, String>) mainObject.get(constants.FIELD_MAP);
+        PricingUtil.setFields(mapFields, lineItem);
+        RuleEngine ruleEngine = new RuleEngine();
+        PricingInterferenceEngine pricingInterference = new PricingInterferenceEngine();
+        combined = new ArrayList<>();
+        for (Map.Entry<String, Object> eventList : mapRuleList.entrySet()) {
+            if (!Objects.isNull(eventList.getValue()) && eventList.getValue() instanceof Collection) {
+                for (Event child : (List<Event>) eventList.getValue()) {
+                    if (!Objects.isNull(child.getRuleListSet()) && child.getRuleListSet() != null) {
+                        List<Object> actionResults = ruleEngine.run(pricingInterference, Collections.singletonList(lineItem), Collections.singletonList(child.getRuleListSet()));
+                        if (child.getLogicalRelationship().isEmpty() || child.getLogicalRelationship().compareToIgnoreCase(constants.OR) == 0) {
+                            if (!Objects.isNull(actionResults)) {
+                                combined.addAll(actionResults);
+                                break;
+                            }
+                        } else if (child.getLogicalRelationship().compareToIgnoreCase(constants.AND) == 0) {
+                            if (!Objects.isNull(actionResults) && actionResults.size() == child.getRuleListSet().size()) {
+                                combined.addAll(actionResults);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return combined;
+    }
 
     @Override
     public Object buildRule (InputStream inputStream, InputStream ruleStream, InputStream indexYaml) {
@@ -40,7 +75,6 @@ public class CBDPricingServiceImpl implements CBDPricingService {
                         Map<String, String> mapInputFields = new HashMap<>();
                         PricingUtil.addToRef(ruleIndex, mapProperties, mapRuleFields, mapInputFields);
                         mainObj.put(FIELD_MAP, mapInputFields);
-                        //List<Object> ruleListObj = null;
                         Map<String, Object> ruleListObj = new HashMap<>();
                         if (rule instanceof Map) {
                             ruleListObj = retrieveItemMap(ruleIndex, (Map<String, Object>) rule);
@@ -50,16 +84,13 @@ public class CBDPricingServiceImpl implements CBDPricingService {
                         if (!ObjectUtils.isEmpty(ruleListObj)) {
 
                             Map<String, Object> mapRuleList = new HashMap<>();
-                            Map<String, String> mapRelationship = new HashMap<>();
                             for (Map.Entry<String, Object> subObject : ruleListObj.entrySet()) {
-                                List<Rule> ruleList = new ArrayList<>();
+                                List<Event> eventList = new ArrayList<>();
                                 List<Object> ruleListSubObject = (List<Object>) subObject.getValue();
-                                String relationshipAmongRule = PricingUtil.SetRule(ruleListSubObject, ruleList, mapProperties, mapRuleFields);
-                                mapRuleList.put (subObject.getKey(), ruleList);
-                                mapRelationship.put (subObject.getKey(), relationshipAmongRule);
+                                PricingUtil.SetEvent(ruleListSubObject, eventList, mapProperties, mapRuleFields);
+                                mapRuleList.put (subObject.getKey(), eventList);
                             }
                             mainObj.put(RULE, mapRuleList);
-                            mainObj.put(RELATIONSHIP, mapRelationship);
                         }
                     }
                 }
@@ -155,7 +186,6 @@ public class CBDPricingServiceImpl implements CBDPricingService {
                     } else return subObject;
                 } else if (entry.getKey().compareToIgnoreCase(RootType) == 0) {
                     List<Object> ruleListObj = new ArrayList<>();
-                    //return (List<Object>) object.get(0);
                     return filterByType(entry.getValue(), ruleListObj, object);
                 }
             }

@@ -3,11 +3,11 @@ public class constants {
 
     public static final String AND = "AND";
     public static final String OR = "OR";
+    public static final String ADJUSTMENT = "Adjustment";
     public static final String INPUT_ARGS = "{Input}";
     public static final String INPUT = "Input";
     public static final String PRODUCT_ORDER = "Product Order";
     public static final String RULE = "Rule";
-    public static final String RELATIONSHIP = "Relationship";
     public static final String FIELD_MAP = "Field Map";
     public static final String RootType = "RootType";
     public static final String LIST = "[";

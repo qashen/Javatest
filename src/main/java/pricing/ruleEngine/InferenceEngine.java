@@ -3,12 +3,10 @@ package pricing.ruleEngine;
 import lombok.extern.slf4j.Slf4j;
 import pricing.langParser.RuleParser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
+//@Slf4j
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
     private final RuleParser<INPUT_DATA, OUTPUT_RESULT> ruleParser;
@@ -58,17 +56,19 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
     protected OUTPUT_RESULT executeRule(Rule rule, INPUT_DATA inputData) {
         List<OUTPUT_RESULT> outputParent = new ArrayList<>();
         List<OUTPUT_RESULT> outputAction = new ArrayList<>();
-        outputParent.add((OUTPUT_RESULT) inputData);
         for (String expression : rule.getActionSet()) {
             OUTPUT_RESULT outputResult = initializeOutputResult();
             outputResult = ruleParser.parseAction(expression, inputData, outputResult);
             outputAction.add(outputResult);
         }
-        outputParent.add ((OUTPUT_RESULT) outputAction);
+        inputData = (INPUT_DATA) add(inputData, (INPUT_DATA) outputAction);
+        outputParent.add ((OUTPUT_RESULT) inputData);
         return (OUTPUT_RESULT) outputParent;
     }
 
     protected abstract OUTPUT_RESULT initializeOutputResult();
 
     protected abstract RuleNamespace getRuleNamespace();
+
+    protected abstract INPUT_DATA add (INPUT_DATA inputData, INPUT_DATA child);
 }

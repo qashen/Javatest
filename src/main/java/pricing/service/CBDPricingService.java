@@ -10,6 +10,7 @@ import java.util.Map;
 
 public interface CBDPricingService {
 
+    Object priceCBD (InputStream inputStream, InputStream ruleStream, InputStream indexYaml);
     Object buildRule (InputStream inputStream, InputStream ruleStream, InputStream indexYaml);
 
     Object retrieveInputMessage(InputStream is) throws JsonProcessingException;

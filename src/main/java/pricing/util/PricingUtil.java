@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import pricing.rule.ActionDetails;
+import pricing.ruleEngine.Event;
 import pricing.ruleEngine.Rule;
 import pricing.ruleEngine.RuleNamespace;
 
@@ -18,7 +19,7 @@ import static pricing.util.constants.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class PricingUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PricingUtil.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(PricingUtil.class);
 
     private static final ObjectMapper mapper = new ObjectMapper()
             .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
@@ -29,7 +30,7 @@ public class PricingUtil {
         try {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException jsonError) {
-            LOGGER.error("Error converting object to json {}", jsonError.getMessage());
+           // LOGGER.error("Error converting object to json {}", jsonError.getMessage());
             throw new RuntimeException("Obj_JSON_Err");
         }
     }
@@ -38,7 +39,7 @@ public class PricingUtil {
         try {
             return mapper.readValue(json, clazz);
         } catch (JsonProcessingException jsonError) {
-            LOGGER.error("Error converting json to object {}", jsonError.getMessage());
+            //LOGGER.error("Error converting json to object {}", jsonError.getMessage());
             throw new RuntimeException("JSON_Obj_Err");
         }
     }
@@ -48,7 +49,7 @@ public class PricingUtil {
             String json = convertObjectToJson(jsonMap);
             return mapper.readValue(json, clazz);
         } catch (JsonProcessingException jsonError) {
-            LOGGER.error("Error converting json to object {}", jsonError.getMessage());
+           // LOGGER.error("Error converting json to object {}", jsonError.getMessage());
             throw new RuntimeException("JSONMap_Obj_Err");
         }
     }
@@ -111,74 +112,76 @@ public class PricingUtil {
         }
     }
 
-    public static String SetRule(List<Object> pr, List<Rule> ruleList, Map<String, String> mapProperties, Map<String, String> mapFields) {
-        String relationshipAmongRule = null;
+    public static void SetEvent(List<Object> input, List<Event> eventList, Map<String, String> mapProperties, Map<String, String> mapFields) {
+        for (Object child : input) {
+            Event event = new Event();
+            List<Rule> ruleList = new ArrayList<>();
+            if (!Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_INTER_GROUP)))) {
+                event.setLogicalRelationship(((LinkedHashMap) child).get(mapProperties.get(TAG_INTER_GROUP)).toString());
+            }
+            if (!Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY))) &&
+                    !((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY)).toString().isEmpty()) {
+                event.setPriority(Integer.parseInt(((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY)).toString()));
+            }
+            SetRule((LinkedHashMap<String, Object>) child, ruleList, mapProperties, mapFields);
+            event.setRuleListSet(ruleList);
+            eventList.add(event);
+        }
+    }
+
+    public static void SetRule(LinkedHashMap<String, Object> input, List<Rule> ruleList, Map<String, String> mapProperties, Map<String, String> mapFields) {
         AtomicReference<String> Input = new AtomicReference<>();
         HashMap<String, ActionDetails> actionMaps = new HashMap<>();
         HashMap<String, String> operator = new HashMap<>();
         operator.put(Operator.EQUALS.toString(), Operator.EQUALS.getMathsymbol());
-        for (Object p : pr) {
-            if (!Objects.isNull(((LinkedHashMap) p).get(mapProperties.get(TAG_ID))) &&
-                    !((LinkedHashMap) p).get(mapProperties.get(TAG_ID)).toString().isEmpty()) {
-                if (!Objects.isNull(((LinkedHashMap) p).get(mapProperties.get(TAG_INTER_GROUP)))) {
-                    relationshipAmongRule = ((LinkedHashMap) p).get(mapProperties.get(TAG_INTER_GROUP)).toString();
-                }
-
-                List<Object> criteriaGroupList = (List<Object>) ((LinkedHashMap) p).get(mapProperties.get(TAG_GROUP_NAME));
-                if (!ObjectUtils.isEmpty(criteriaGroupList)) {
-                    for (Object criteriaGroup : criteriaGroupList) {
-                        Rule rule = new Rule();
-                        final StringJoiner[] stringJoiner = {new StringJoiner("")};
-                        int counter = 0;
-                        List<Object> criteriaList = (List<Object>) ((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_CRITERIA_NAME));
-                        if (!ObjectUtils.isEmpty(criteriaList)) {
-                            for (Object criteria : criteriaList) {
-                                if (counter != 0) {
-                                    if (((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_INTRA_GROUP)).toString().compareToIgnoreCase(constants.AND) == 0) {
-                                        stringJoiner[0].add(" && ");
-                                    } else if (((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_INTRA_GROUP)).toString().compareToIgnoreCase(constants.OR) == 0) {
-                                        stringJoiner[0].add(" || ");
-                                    }
-                                }
-                                if (ObjectUtils.isNumeric(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString())) {
-                                    Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
-                                            ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " " +
-                                            ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString());
-                                } else if (!ObjectUtils.isNumeric(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString())) {
-                                    Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
-                                            ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " '" +
-                                            ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString() + "'");
-
-                                } else {
-                                    Input.set("");
-                                }
-                                    operator.forEach((key, value) -> {
-                                        String convertedRule = java.util.regex.Pattern.compile(key).matcher(Input.get()).replaceAll(value);
-                                        stringJoiner[0].add(convertedRule);
-                                    });
-                                counter++;
+        for (Object child : (List<Object>) input.get(mapProperties.get(TAG_GROUP_NAME))) {
+            if (!ObjectUtils.isEmpty(child) && !Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_ID))) &&
+                    !((LinkedHashMap) child).get(mapProperties.get(TAG_ID)).toString().isEmpty()) {
+                Rule rule = new Rule();
+                final StringJoiner[] stringJoiner = {new StringJoiner("")};
+                int counter = 0;
+                List<Object> criteriaList = (List<Object>) ((LinkedHashMap) child).get(mapProperties.get(TAG_CRITERIA_NAME));
+                if (!ObjectUtils.isEmpty(criteriaList)) {
+                    for (Object criteria : criteriaList) {
+                        if (counter != 0) {
+                            if (((LinkedHashMap) child).get(mapProperties.get(TAG_INTRA_GROUP)).toString().compareToIgnoreCase(constants.AND) == 0) {
+                                stringJoiner[0].add(" && ");
+                            } else if (((LinkedHashMap) child).get(mapProperties.get(TAG_INTRA_GROUP)).toString().compareToIgnoreCase(constants.OR) == 0) {
+                                stringJoiner[0].add(" || ");
                             }
                         }
-                        rule.setRuleNamespace(RuleNamespace.valueOf("PRICING"));
-                        if (!Objects.isNull(((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_ID)))) {
-                            rule.setRuleId(((LinkedHashMap) criteriaGroup).get(mapProperties.get(TAG_ID)).toString());
+                        if (ObjectUtils.isNumeric(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString())) {
+                            Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
+                                    ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " " +
+                                    ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString());
+                        } else if (!ObjectUtils.isNumeric(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString())) {
+                            Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
+                                    ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " '" +
+                                    ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString() + "'");
+
+                        } else {
+                            Input.set("");
                         }
-                        rule.setCondition(stringJoiner[0].toString());
-                        SetActions(pr, rule, actionMaps, mapProperties);
-                        if (!Objects.isNull(((LinkedHashMap) p).get(mapProperties.get(TAG_PRIORITY))) &&
-                                !((LinkedHashMap) p).get(mapProperties.get(TAG_PRIORITY)).toString().isEmpty()) {
-                            rule.setPriority(Integer.parseInt(((LinkedHashMap) p).get(mapProperties.get(TAG_PRIORITY)).toString()));
-                        }
-                        ruleList.add(rule);
+                        operator.forEach((key, value) -> {
+                            String convertedRule = java.util.regex.Pattern.compile(key).matcher(Input.get()).replaceAll(value);
+                            stringJoiner[0].add(convertedRule);
+                        });
+                        counter++;
                     }
                 }
+                rule.setRuleNamespace(RuleNamespace.valueOf("PRICING"));
+                if (!Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_ID)))) {
+                    rule.setRuleId(((LinkedHashMap) child).get(mapProperties.get(TAG_ID)).toString());
+                }
+                rule.setCondition(stringJoiner[0].toString());
+                SetActions(input, rule, actionMaps, mapProperties);
+                ruleList.add(rule);
             }
         }
-        return relationshipAmongRule;
     }
 
-    public static void SetActions(List<Object> pr, Rule rule, HashMap<String, ActionDetails> actionMaps, Map<String, String> mapProperties) {
-        SetActions(pr, actionMaps, mapProperties);
+    public static void SetActions(LinkedHashMap<String, Object> input, Rule rule, HashMap<String, ActionDetails> actionMaps, Map<String, String> mapProperties) {
+        SetActions(input, actionMaps, mapProperties);
         List<String> actionSet = new ArrayList<>();
         AtomicReference<String> actionInput = new AtomicReference<>();
         actionMaps.forEach((key, value) -> {
@@ -190,34 +193,29 @@ public class PricingUtil {
         rule.setActionSet(actionSet);
     }
 
-    public static void SetActions(List<Object> pr, HashMap<String, ActionDetails> actionMaps, Map<String, String> mapProperties) {
-        AtomicReference<String> Input = new AtomicReference<>();
-        for (Object p : pr) {
-            if (!((LinkedHashMap) p).get(mapProperties.get(TAG_ID)).toString().isEmpty()) {
-                List<Object> actionList = (List<Object>) ((LinkedHashMap) p).get(mapProperties.get(TAG_ACTION));
-                if (!ObjectUtils.isEmpty(actionList)) {
-                    for (Object action : actionList) {
-                        ActionDetails actionDetails = new ActionDetails();
-                        double d = Double.parseDouble(((LinkedHashMap) action).get(mapProperties.get(TAG_ACTION_VAL)).toString());
-                        actionDetails.setAdjustmentValue(d);
-                        Object actionTypeList = ((LinkedHashMap) action).get(mapProperties.get(TAG_ACTION_TYPE));
-                        if (!ObjectUtils.isEmpty(actionTypeList)) {
-                            if (actionTypeList instanceof Collection) {
-                                actionDetails.setAdjustmentType(((List<Object>) actionTypeList).get(0).toString());
-                            } else if (actionTypeList instanceof String) {
-                                actionDetails.setAdjustmentType((String) actionTypeList);
-                            }
-                        }
-                        List<Object> actionValueObjList = (List<Object>) ((LinkedHashMap) action).get(mapProperties.get(TAG_ACTION_VAL_OBJ));
-                        if (!ObjectUtils.isEmpty(actionValueObjList)) {
-                            for (Object actionValueObj : actionValueObjList) {
-                                actionDetails.setPriceFieldName(((LinkedHashMap) actionValueObj).get(mapProperties.get(TAG_ACTION_OBJ_TYPE)).toString());
-                            }
-                        }
-                        actionDetails.setExpression(getActionExpression(Input, actionDetails));
-                        actionMaps.put((((LinkedHashMap) action).get(mapProperties.get(TAG_ID)).toString()), actionDetails);
+    public static void SetActions(LinkedHashMap<String, Object> input, HashMap<String, ActionDetails> actionMaps, Map<String, String> mapProperties) {
+        AtomicReference<String> expression = new AtomicReference<>();
+        for (Object child : (List<Object>) input.get(mapProperties.get(TAG_ACTION))) {
+            if (!ObjectUtils.isEmpty(child) && !((LinkedHashMap) child).get(mapProperties.get(TAG_ID)).toString().isEmpty()) {
+                ActionDetails actionDetails = new ActionDetails();
+                double d = Double.parseDouble(((LinkedHashMap) child).get(mapProperties.get(TAG_ACTION_VAL)).toString());
+                actionDetails.setAdjustmentValue(d);
+                Object actionTypeList = ((LinkedHashMap) child).get(mapProperties.get(TAG_ACTION_TYPE));
+                if (!ObjectUtils.isEmpty(actionTypeList)) {
+                    if (actionTypeList instanceof Collection) {
+                        actionDetails.setAdjustmentType(((List<Object>) actionTypeList).get(0).toString());
+                    } else if (actionTypeList instanceof String) {
+                        actionDetails.setAdjustmentType((String) actionTypeList);
                     }
                 }
+                List<Object> actionValueObjList = (List<Object>) ((LinkedHashMap) child).get(mapProperties.get(TAG_ACTION_VAL_OBJ));
+                if (!ObjectUtils.isEmpty(actionValueObjList)) {
+                    for (Object actionValueObj : actionValueObjList) {
+                        actionDetails.setPriceFieldName(((LinkedHashMap) actionValueObj).get(mapProperties.get(TAG_ACTION_OBJ_TYPE)).toString());
+                    }
+                }
+                actionDetails.setExpression(getActionExpression(expression, actionDetails));
+                actionMaps.put((((LinkedHashMap) child).get(mapProperties.get(TAG_ID)).toString()), actionDetails);
             }
         }
     }

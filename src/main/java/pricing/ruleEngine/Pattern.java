@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Event {
+public class Pattern {
     Integer priority;
     String logicalRelationship;
     List<Rule> ruleListSet;

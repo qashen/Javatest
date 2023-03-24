@@ -6,7 +6,7 @@ import pricing.langParser.RuleParser;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//@Slf4j
+@Slf4j
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
     private final RuleParser<INPUT_DATA, OUTPUT_RESULT> ruleParser;
@@ -61,7 +61,7 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
             outputResult = ruleParser.parseAction(expression, inputData, outputResult);
             outputAction.add(outputResult);
         }
-        inputData = (INPUT_DATA) add(inputData, (INPUT_DATA) outputAction);
+        inputData = add(inputData, (INPUT_DATA) outputAction);
         outputParent.add ((OUTPUT_RESULT) inputData);
         return (OUTPUT_RESULT) outputParent;
     }

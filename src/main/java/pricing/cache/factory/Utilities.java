@@ -8,6 +8,7 @@ import java.io.InvalidClassException;
 import java.io.InvalidObjectException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -463,7 +464,7 @@ public class Utilities {
 	public static boolean isNumeric(String s) {
 		boolean isNumeric = true;
 		try {
-			Double.parseDouble(s);
+			new BigDecimal(s);
 		} catch (Exception ex) {
 			isNumeric = false;
 		}

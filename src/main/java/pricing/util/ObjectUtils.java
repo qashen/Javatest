@@ -1,6 +1,7 @@
 package pricing.util;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class ObjectUtils {
         }
 
         if (obj instanceof Optional) {
-            return !((Optional<?>) obj).isPresent();
+            return ((Optional<?>) obj).isEmpty();
         }
         if (obj instanceof CharSequence) {
             return ((CharSequence) obj).length() == 0;
@@ -40,7 +41,7 @@ public class ObjectUtils {
             return false;
         }
         try {
-            double d = Double.parseDouble(strNum);
+            new BigDecimal(strNum);
         } catch (NumberFormatException nfe) {
             return false;
         }

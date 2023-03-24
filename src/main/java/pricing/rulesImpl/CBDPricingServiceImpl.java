@@ -3,7 +3,7 @@ package pricing.rulesImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import pricing.ruleEngine.Event;
+import pricing.ruleEngine.Pattern;
 import pricing.ruleEngine.RuleEngine;
 import pricing.service.CBDPricingService;
 import pricing.util.ObjectUtils;
@@ -33,9 +33,9 @@ public class CBDPricingServiceImpl implements CBDPricingService {
         RuleEngine ruleEngine = new RuleEngine();
         PricingInterferenceEngine pricingInterference = new PricingInterferenceEngine();
         combined = new ArrayList<>();
-        for (Map.Entry<String, Object> eventList : mapRuleList.entrySet()) {
-            if (!Objects.isNull(eventList.getValue()) && eventList.getValue() instanceof Collection) {
-                for (Event child : (List<Event>) eventList.getValue()) {
+        for (Map.Entry<String, Object> patternList : mapRuleList.entrySet()) {
+            if (!Objects.isNull(patternList.getValue()) && patternList.getValue() instanceof Collection) {
+                for (Pattern child : (List<Pattern>) patternList.getValue()) {
                     if (!Objects.isNull(child.getRuleListSet()) && child.getRuleListSet() != null) {
                         List<Object> actionResults = ruleEngine.run(pricingInterference, Collections.singletonList(lineItem), Collections.singletonList(child.getRuleListSet()));
                         if (child.getLogicalRelationship().isEmpty() || child.getLogicalRelationship().compareToIgnoreCase(constants.OR) == 0) {
@@ -85,10 +85,10 @@ public class CBDPricingServiceImpl implements CBDPricingService {
 
                             Map<String, Object> mapRuleList = new HashMap<>();
                             for (Map.Entry<String, Object> subObject : ruleListObj.entrySet()) {
-                                List<Event> eventList = new ArrayList<>();
+                                List<Pattern> patternList = new ArrayList<>();
                                 List<Object> ruleListSubObject = (List<Object>) subObject.getValue();
-                                PricingUtil.SetEvent(ruleListSubObject, eventList, mapProperties, mapRuleFields);
-                                mapRuleList.put (subObject.getKey(), eventList);
+                                PricingUtil.SetPattern(ruleListSubObject, patternList, mapProperties, mapRuleFields);
+                                mapRuleList.put (subObject.getKey(), patternList);
                             }
                             mainObj.put(RULE, mapRuleList);
                         }

@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pricing.rule.ActionDetails;
-import pricing.ruleEngine.Event;
+import pricing.ruleEngine.Pattern;
 import pricing.ruleEngine.Rule;
 import pricing.ruleEngine.RuleNamespace;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,8 +20,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import static pricing.util.constants.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
+@Slf4j
 public class PricingUtil {
-    //private static final Logger LOGGER = LoggerFactory.getLogger(PricingUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PricingUtil.class);
 
     private static final ObjectMapper mapper = new ObjectMapper()
             .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
@@ -30,7 +33,7 @@ public class PricingUtil {
         try {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException jsonError) {
-           // LOGGER.error("Error converting object to json {}", jsonError.getMessage());
+            LOGGER.error("Error converting object to json {}", jsonError.getMessage());
             throw new RuntimeException("Obj_JSON_Err");
         }
     }
@@ -39,7 +42,7 @@ public class PricingUtil {
         try {
             return mapper.readValue(json, clazz);
         } catch (JsonProcessingException jsonError) {
-            //LOGGER.error("Error converting json to object {}", jsonError.getMessage());
+            LOGGER.error("Error converting json to object {}", jsonError.getMessage());
             throw new RuntimeException("JSON_Obj_Err");
         }
     }
@@ -49,7 +52,7 @@ public class PricingUtil {
             String json = convertObjectToJson(jsonMap);
             return mapper.readValue(json, clazz);
         } catch (JsonProcessingException jsonError) {
-           // LOGGER.error("Error converting json to object {}", jsonError.getMessage());
+            LOGGER.error("Error converting json to object {}", jsonError.getMessage());
             throw new RuntimeException("JSONMap_Obj_Err");
         }
     }
@@ -112,20 +115,20 @@ public class PricingUtil {
         }
     }
 
-    public static void SetEvent(List<Object> input, List<Event> eventList, Map<String, String> mapProperties, Map<String, String> mapFields) {
+    public static void SetPattern(List<Object> input, List<Pattern> patternList, Map<String, String> mapProperties, Map<String, String> mapFields) {
         for (Object child : input) {
-            Event event = new Event();
+            Pattern pattern = new Pattern();
             List<Rule> ruleList = new ArrayList<>();
             if (!Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_INTER_GROUP)))) {
-                event.setLogicalRelationship(((LinkedHashMap) child).get(mapProperties.get(TAG_INTER_GROUP)).toString());
+                pattern.setLogicalRelationship(((LinkedHashMap) child).get(mapProperties.get(TAG_INTER_GROUP)).toString());
             }
             if (!Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY))) &&
                     !((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY)).toString().isEmpty()) {
-                event.setPriority(Integer.parseInt(((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY)).toString()));
+                pattern.setPriority(Integer.parseInt(((LinkedHashMap) child).get(mapProperties.get(TAG_PRIORITY)).toString()));
             }
             SetRule((LinkedHashMap<String, Object>) child, ruleList, mapProperties, mapFields);
-            event.setRuleListSet(ruleList);
-            eventList.add(event);
+            pattern.setRuleListSet(ruleList);
+            patternList.add(pattern);
         }
     }
 
@@ -198,8 +201,8 @@ public class PricingUtil {
         for (Object child : (List<Object>) input.get(mapProperties.get(TAG_ACTION))) {
             if (!ObjectUtils.isEmpty(child) && !((LinkedHashMap) child).get(mapProperties.get(TAG_ID)).toString().isEmpty()) {
                 ActionDetails actionDetails = new ActionDetails();
-                double d = Double.parseDouble(((LinkedHashMap) child).get(mapProperties.get(TAG_ACTION_VAL)).toString());
-                actionDetails.setAdjustmentValue(d);
+                BigDecimal actionValue = new BigDecimal((((LinkedHashMap) child).get(mapProperties.get(TAG_ACTION_VAL)).toString()));
+                actionDetails.setAdjustmentValue(actionValue);
                 Object actionTypeList = ((LinkedHashMap) child).get(mapProperties.get(TAG_ACTION_TYPE));
                 if (!ObjectUtils.isEmpty(actionTypeList)) {
                     if (actionTypeList instanceof Collection) {
@@ -221,21 +224,22 @@ public class PricingUtil {
     }
 
     public static String getActionExpression(AtomicReference<String> Input, ActionDetails actionDetails) {
-        double ratio;
-        switch (actionDetails.getAdjustmentType()) {
-            case "discount" -> {
-                ratio = 1 - (Double) actionDetails.getAdjustmentValue();
-                Input.set("(double)" + constants.INPUT_ARGS + " * " + ratio);
+        BigDecimal ratio;
+        BigDecimal one = new BigDecimal(1);
+        switch (actionDetails.getAdjustmentType().toUpperCase()) {
+            case "DISCOUNT" -> {
+                ratio = one.subtract(actionDetails.getAdjustmentValue());
+                Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " * " + ratio + ")");
             }
             case "FIXED_MARKUP" ->
-                    Input.set("(double)" + constants.INPUT_ARGS + " + " + actionDetails.getAdjustmentValue());
+                    Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " + " + actionDetails.getAdjustmentValue());
             case "OVERRIDE" -> Input.set(actionDetails.getAdjustmentValue().toString());
             case "PERCENT_MARKUP" -> {
-                ratio = 1 + (Double) actionDetails.getAdjustmentValue();
-                Input.set("(double)" + constants.INPUT_ARGS + " * " + ratio);
+                ratio = one.add(actionDetails.getAdjustmentValue());
+                Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " * " + ratio);
             }
             case "REDUCTION" ->
-                    Input.set("(double)" + constants.INPUT_ARGS + " - " + actionDetails.getAdjustmentValue());
+                    Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " - " + actionDetails.getAdjustmentValue());
             default -> {
             }
         }

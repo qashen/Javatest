@@ -1,18 +1,11 @@
 package pricing;
 
-import pricing.ruleEngine.Event;
-import pricing.ruleEngine.RuleEngine;
 import pricing.rulesImpl.CBDPricingServiceImpl;
-import pricing.util.constants;
 import pricing.util.PricingUtil;
-import pricing.rulesImpl.PricingInterferenceEngine;
-
 import java.io.InputStream;
-import java.util.*;
-@SuppressWarnings({ "unchecked"})
+
 public class Main {
     public static void main(String[] args) {
-
         CBDPricingServiceImpl cbdPricingService = new CBDPricingServiceImpl();
         ClassLoader classLoader = cbdPricingService.getClass().getClassLoader();
         InputStream is = classLoader.getResourceAsStream("siebelmessage_PO_match.json");

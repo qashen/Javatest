@@ -68,7 +68,5 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
 
     protected abstract OUTPUT_RESULT initializeOutputResult();
 
-    protected abstract RuleNamespace getRuleNamespace();
-
     protected abstract INPUT_DATA add (INPUT_DATA inputData, INPUT_DATA child);
 }

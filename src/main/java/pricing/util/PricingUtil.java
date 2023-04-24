@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import pricing.rule.ActionDetails;
 import pricing.ruleEngine.Pattern;
 import pricing.ruleEngine.Rule;
-import pricing.ruleEngine.RuleNamespace;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -172,7 +171,6 @@ public class PricingUtil {
                         counter++;
                     }
                 }
-                rule.setRuleNamespace(RuleNamespace.valueOf("PRICING"));
                 if (!Objects.isNull(((LinkedHashMap) child).get(mapProperties.get(TAG_ID)))) {
                     rule.setRuleId(((LinkedHashMap) child).get(mapProperties.get(TAG_ID)).toString());
                 }
@@ -227,20 +225,34 @@ public class PricingUtil {
         BigDecimal ratio;
         BigDecimal one = new BigDecimal(1);
         switch (actionDetails.getAdjustmentType().toUpperCase()) {
-            case "DISCOUNT" -> {
+            case "DISCOUNT":
+            case ADJUSTMENT_TYPE_PERCENTAGE: {
                 ratio = one.subtract(actionDetails.getAdjustmentValue());
                 Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " * " + ratio + ")");
+                break;
             }
-            case "FIXED_MARKUP" ->
-                    Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " + " + actionDetails.getAdjustmentValue());
-            case "OVERRIDE" -> Input.set(actionDetails.getAdjustmentValue().toString());
-            case "PERCENT_MARKUP" -> {
+            case "FIXED_MARKUP":
+            case ADJUSTMENT_TYPE_MARKUP: {
+                Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " + " + actionDetails.getAdjustmentValue());
+                break;
+            }
+            case "OVERRIDE":
+            case ADJUSTMENT_TYPE_OVERRIDE: {
+                Input.set(actionDetails.getAdjustmentValue().toString());
+                break;
+            }
+            case "PERCENT_MARKUP":
+            case ADJUSTMENT_TYPE_MARKUP_PERCENTAGE: {
                 ratio = one.add(actionDetails.getAdjustmentValue());
                 Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " * " + ratio);
+                break;
             }
-            case "REDUCTION" ->
-                    Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " - " + actionDetails.getAdjustmentValue());
-            default -> {
+            case "REDUCTION":
+            case ADJUSTMENT_TYPE_DISCOUNT: {
+                Input.set("new java.math.BigDecimal(" + constants.INPUT_ARGS + " - " + actionDetails.getAdjustmentValue());
+                break;
+            }
+            default: {break;
             }
         }
         return Input.toString();

@@ -4,6 +4,11 @@ public class constants {
     public static final String AND = "AND";
     public static final String OR = "OR";
     public static final String ADJUSTMENT = "Adjustment";
+    public static final String ADJUSTMENT_TYPE_DISCOUNT = "Discount Amount";
+    public static final String ADJUSTMENT_TYPE_PERCENTAGE = "% Discount";
+    public static final String ADJUSTMENT_TYPE_OVERRIDE = "Price Override";
+    public static final String ADJUSTMENT_TYPE_MARKUP = "Markup Amount";
+    public static final String ADJUSTMENT_TYPE_MARKUP_PERCENTAGE = "% Markup";
     public static final String INPUT_ARGS = "{Input}";
     public static final String INPUT = "Input";
     public static final String PRODUCT_ORDER = "Product Order";

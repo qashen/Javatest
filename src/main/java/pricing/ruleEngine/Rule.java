@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class Rule {
-    RuleNamespace ruleNamespace;
     String ruleId;
     String condition;
     Integer priority;

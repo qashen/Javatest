@@ -1,7 +1,6 @@
 package pricing.rulesImpl;
 
 import pricing.ruleEngine.InferenceEngine;
-import pricing.ruleEngine.RuleNamespace;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,10 +10,6 @@ import java.util.Map;
 import static pricing.util.constants.ADJUSTMENT;
 
 public class PricingInterferenceEngine extends InferenceEngine<Object, HashMap> {
-    @Override
-    protected RuleNamespace getRuleNamespace() {
-        return RuleNamespace.PRICING;
-    }
 
     @Override
     protected HashMap initializeOutputResult() {

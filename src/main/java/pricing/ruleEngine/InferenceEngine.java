@@ -1,12 +1,13 @@
 package pricing.ruleEngine;
-import pricing.langParser.RuleParser;
+
 import lombok.extern.slf4j.Slf4j;
+import pricing.langParser.RuleParser;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
     private final RuleParser<INPUT_DATA, OUTPUT_RESULT> ruleParser;
 
@@ -38,39 +39,34 @@ public abstract class InferenceEngine<INPUT_DATA, OUTPUT_RESULT> {
                 .filter(
                         rule -> {
                             String condition = rule.getCondition();
-                            return ruleParser.parseCondition(condition, inputData, rule.bSkipDSLHandling);
+                            return ruleParser.parseCondition(condition, inputData);
                         }
                 )
                 .collect(Collectors.toList());
     }
 
 
-    protected Rule resolve(List<Rule> conflictSet){
+    protected Rule resolve(List<Rule> conflictSet) {
         Optional<Rule> rule = conflictSet.stream()
                 .findFirst();
         return rule.orElse(null);
     }
 
 
-    protected OUTPUT_RESULT executeRule(Rule rule, INPUT_DATA inputData){
-        if (!rule.bSkipDSLHandling) {
+    protected OUTPUT_RESULT executeRule(Rule rule, INPUT_DATA inputData) {
+        List<OUTPUT_RESULT> outputParent = new ArrayList<>();
+        List<OUTPUT_RESULT> outputAction = new ArrayList<>();
+        for (String expression : rule.getActionSet()) {
             OUTPUT_RESULT outputResult = initializeOutputResult();
-            return ruleParser.parseAction(rule.getAction(), inputData, outputResult, false);
+            outputResult = ruleParser.parseAction(expression, inputData, outputResult);
+            outputAction.add(outputResult);
         }
-        else
-        {
-            List<OUTPUT_RESULT> outputParent = new ArrayList<>();
-            for (String expression: rule.getActionSet()) {
-                OUTPUT_RESULT outputResult = initializeOutputResult();
-                outputResult = ruleParser.parseAction(expression, inputData, outputResult);
-                outputParent.add(outputResult);
-            }
-            return (OUTPUT_RESULT) outputParent;
-
-        }
-
+        inputData = add(inputData, (INPUT_DATA) outputAction);
+        outputParent.add ((OUTPUT_RESULT) inputData);
+        return (OUTPUT_RESULT) outputParent;
     }
 
     protected abstract OUTPUT_RESULT initializeOutputResult();
-    protected abstract RuleNamespace getRuleNamespace();
+
+    protected abstract INPUT_DATA add (INPUT_DATA inputData, INPUT_DATA child);
 }

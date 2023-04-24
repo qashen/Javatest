@@ -1,5 +1,4 @@
 package pricing.ruleEngine;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Rule {
-    String ruleId;
-    String condition;
+public class Pattern {
     Integer priority;
-    String description;
-    List<String> actionSet;
+    String logicalRelationship;
+    List<Rule> ruleListSet;
 }

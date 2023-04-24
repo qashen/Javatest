@@ -5,9 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
 
-
-    protected DSLParser dslParser;
-
     protected MVELParser mvelParser;
 
     private final String INPUT_KEYWORD = "input";
@@ -15,7 +12,6 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
 
     private final String MAP_KEYWORD = "map";
     public RuleParser() {
-        this.dslParser = new DSLParser();
         this.mvelParser = new MVELParser();
     }
 
@@ -28,14 +24,7 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
      * @param expression
      * @param inputData
      */
-    public boolean parseCondition(String expression, INPUT_DATA inputData, boolean bSkipDSLHandling) {
-        //String resolvedDslExpression;
-        if (!bSkipDSLHandling) {
-            expression = dslParser.resolveDomainSpecificKeywords(expression);
-        }
-        //else {
-        //    resolvedDslExpression = expression;
-        //}
+    public boolean parseCondition(String expression, INPUT_DATA inputData) {
         Map<String, Object> input = new HashMap<>();
         input.put(INPUT_KEYWORD, inputData);
         boolean match = mvelParser.parseMvelExpression(expression, input);
@@ -53,26 +42,6 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
      * @param outputResult
      * @return
      */
-    public OUTPUT_RESULT parseAction(String expression, INPUT_DATA inputData, OUTPUT_RESULT outputResult, boolean bSkipDSLHandling) {
-        if (!bSkipDSLHandling){
-            expression = dslParser.resolveDomainSpecificKeywords(expression);
-        }
-        Map<String, Object> input = new HashMap<>();
-        input.put(INPUT_KEYWORD, inputData);
-        input.put(OUTPUT_KEYWORD, outputResult);
-        Map<String, String> maps = new HashMap<>();
-        input.put(MAP_KEYWORD, maps);
-        mvelParser.parseMvelExpression(expression, input);
-        for (Map.Entry m : maps.entrySet())
-        {
-            if (((LinkedHashMap) outputResult).get (m.getKey()) != null)
-            {
-                ((LinkedHashMap) outputResult).put (m.getKey(),m.getValue());
-            }
-        }
-        return outputResult;
-    }
-
     public OUTPUT_RESULT parseAction(String expression, INPUT_DATA inputData, OUTPUT_RESULT outputResult) {
         Map<String, Object> input = new HashMap<>();
         input.put(INPUT_KEYWORD, inputData);

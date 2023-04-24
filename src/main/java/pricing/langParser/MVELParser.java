@@ -9,7 +9,9 @@ public class MVELParser {
     public boolean parseMvelExpression( String expression, Map<String, Object> inputObjects){
         try {
             return MVEL.evalToBoolean(expression,inputObjects);
-        }catch (Exception e){
+        }catch (NullPointerException ignore){
+        }
+        catch (Exception e){
             log.error("Can not parse Mvel Expression : {} Error: {}", expression, e.getMessage());
         }
         return false;

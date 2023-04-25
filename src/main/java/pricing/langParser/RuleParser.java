@@ -1,14 +1,12 @@
 package pricing.langParser;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import static pricing.util.constants.*;
+
 public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
 
     protected MVELParser mvelParser;
-
-    private final String INPUT_KEYWORD = "input";
-    private final String OUTPUT_KEYWORD = "output";
 
     private final String MAP_KEYWORD = "map";
     public RuleParser() {
@@ -26,7 +24,7 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
      */
     public boolean parseCondition(String expression, INPUT_DATA inputData) {
         Map<String, Object> input = new HashMap<>();
-        input.put(INPUT_KEYWORD, inputData);
+        input.put(INPUT, inputData);
         boolean match = mvelParser.parseMvelExpression(expression, input);
         return match;
     }
@@ -44,7 +42,7 @@ public class RuleParser<INPUT_DATA, OUTPUT_RESULT> {
      */
     public OUTPUT_RESULT parseAction(String expression, INPUT_DATA inputData, OUTPUT_RESULT outputResult) {
         Map<String, Object> input = new HashMap<>();
-        input.put(INPUT_KEYWORD, inputData);
+        input.put(INPUT, inputData);
         input.put(MAP_KEYWORD, outputResult);
         mvelParser.parseMvelExpression(expression, input);
         return outputResult;

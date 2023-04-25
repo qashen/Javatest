@@ -153,11 +153,11 @@ public class PricingUtil {
                             }
                         }
                         if (ObjectUtils.isNumeric(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString())) {
-                            Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
+                            Input.set(INPUT + PERIOD + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
                                     ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " " +
                                     ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString());
                         } else if (!ObjectUtils.isNumeric(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString())) {
-                            Input.set("input." + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
+                            Input.set(INPUT + PERIOD + mapFields.get(((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_PARA)).toString()) + " " +
                                     ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_OP)).toString() + " '" +
                                     ((LinkedHashMap) criteria).get(mapProperties.get(TAG_CRITERIA_VAL)).toString() + "'");
 
@@ -186,7 +186,7 @@ public class PricingUtil {
         List<String> actionSet = new ArrayList<>();
         AtomicReference<String> actionInput = new AtomicReference<>();
         actionMaps.forEach((key, value) -> {
-            String actionExpression = value.getExpression().replace(constants.INPUT_ARGS, "input.Price");
+            String actionExpression = value.getExpression().replace(constants.INPUT_ARGS, INPUT + PERIOD + PRICE);
             actionInput.set("map.put(\"Price\"," + actionExpression + ");map.put(\"Adjustment Type\",\"" + value.getAdjustmentType() + "\");map.put(\"Adjustment Amount\"," + value.getAdjustmentValue() + ");");
             actionSet.add(actionInput.toString());
         });

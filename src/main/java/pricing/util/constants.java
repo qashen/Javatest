@@ -10,7 +10,9 @@ public class constants {
     public static final String ADJUSTMENT_TYPE_MARKUP = "Markup Amount";
     public static final String ADJUSTMENT_TYPE_MARKUP_PERCENTAGE = "% Markup";
     public static final String INPUT_ARGS = "{Input}";
-    public static final String INPUT = "Input";
+    public static final String INPUT = "$";
+    public static final String PERIOD = ".";
+    public static final String PRICE = "Price";
     public static final String PRODUCT_ORDER = "Product Order";
     public static final String RULE = "Rule";
     public static final String FIELD_MAP = "Field Map";
